@@ -67,6 +67,7 @@ export function useSignUpForm() {
     setError(null);
 
     try {
+      // 1. Verify the OTP code
       const { error: verifyError } = await signUp.verifications.verifyEmailCode({
         code,
       });
@@ -76,16 +77,14 @@ export function useSignUpForm() {
         return;
       }
 
-      if (signUp.status === "complete") {
-        const { error: finalizeError } = await signUp.finalize();
-        if (finalizeError) {
-          setError(finalizeError.message || "Failed to finalize session.");
-        }
-      } else {
-        setError("Verification incomplete. Please try again.");
+      // 2. Finalize sign-up session directly once OTP code is verified
+      const { error: finalizeError } = await signUp.finalize();
+      if (finalizeError) {
+        setError(finalizeError.message || "Failed to finalize session.");
+        return;
       }
     } catch (err: any) {
-      console.error(err);
+      console.error("Verification error:", err);
       setError(err?.message || "Invalid verification code.");
     } finally {
       setLoading(false);
