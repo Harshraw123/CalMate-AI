@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { Slot, useRouter, useSegments } from "expo-router";
 import { ClerkProvider, ClerkLoaded, useAuth, useUser } from "@clerk/expo";
 import { tokenCache } from "@/lib/clerk";
-import { doc, getDoc, setDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { getUserProfile, initializeUserProfile } from "@/services/userService";
 import { ActivityIndicator, View, StyleSheet } from "react-native";
 
 function InitialLayout() {
@@ -26,43 +25,28 @@ function InitialLayout() {
         router.replace("/(auth)/sign-up" as any);
       }
     } else {
-      // User is signed in, check and initialize profile in Firestore
+      // User is signed in, check and initialize profile in Firestore via userService
       const checkAndInitializeProfile = async () => {
         if (!user) return;
         
         try {
-          const docRef = doc(db, "users", userId!);
-          const docSnap = await getDoc(docRef);
+          const profile = await getUserProfile(userId!);
           
-          if (docSnap.exists()) {
-            const data = docSnap.data();
-            if (data.onboardingComplete) {
+          if (profile) {
+            if (profile.onboardingComplete) {
               // User profile complete, redirect to main app dashboard
               if (inAuthGroup || isOnboarding) {
                 router.replace("/(app)" as any);
               }
             } else {
-              // Document exists but onboarding not complete, go to onboarding
+              // Profile exists but onboarding incomplete, go to onboarding
               if (!isOnboarding) {
                 router.replace("/(app)/onboarding" as any);
               }
             }
           } else {
-            // Initialize user document with basic Clerk information immediately
-            const userDisplayName =
-              user.fullName ||
-              (user.firstName ? `${user.firstName} ${user.lastName || ""}`.trim() : "") ||
-              user.primaryEmailAddress?.emailAddress?.split("@")[0] ||
-              "User";
-
-            await setDoc(docRef, {
-              clerkId: user.id,
-              name: userDisplayName,
-              email: user.primaryEmailAddress?.emailAddress || "",
-              profileImage: user.imageUrl || "",
-              createdAt: new Date().toISOString(),
-              onboardingComplete: false,
-            });
+            // Initialize user document with basic Clerk info immediately
+            await initializeUserProfile(user);
 
             // Redirect new user to onboarding
             if (!isOnboarding) {
