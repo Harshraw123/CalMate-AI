@@ -67,20 +67,20 @@ export default function OnboardingScreen() {
     setError(null);
 
     try {
-      // Save user profile to Firestore
+      // Save user profile to Firestore using merge to preserve automatically initialized fields
       const userDocRef = doc(db, "users", user.id);
-      await setDoc(userDocRef, {
-        clerkId: user.id,
-        name: name,
-        email: user.primaryEmailAddress?.emailAddress || "",
-        profileImage: user.imageUrl || "",
-        createdAt: new Date().toISOString(),
-        targetCalories: calorieNum,
-        age: ageNum,
-        weight: weightNum,
-        height: heightNum,
-        onboardingComplete: true,
-      });
+      await setDoc(
+        userDocRef,
+        {
+          name: name,
+          targetCalories: calorieNum,
+          age: ageNum,
+          weight: weightNum,
+          height: heightNum,
+          onboardingComplete: true,
+        },
+        { merge: true }
+      );
 
       // Navigate to the main dashboard
       router.replace("/(app)" as any);

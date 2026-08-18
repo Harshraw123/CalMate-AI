@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { Slot, useRouter, useSegments } from "expo-router";
-import { ClerkProvider, ClerkLoaded, useAuth } from "@clerk/expo";
+import { ClerkProvider, ClerkLoaded, useAuth, useUser } from "@clerk/expo";
 import { tokenCache } from "@/lib/clerk";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { ActivityIndicator, View, StyleSheet } from "react-native";
 
 function InitialLayout() {
   const { isLoaded, isSignedIn, userId } = useAuth();
+  const { user } = useUser();
   const segments = useSegments() as any;
   const router = useRouter();
   const [checkingProfile, setCheckingProfile] = useState(true);
@@ -25,26 +26,46 @@ function InitialLayout() {
         router.replace("/(auth)/sign-up" as any);
       }
     } else {
-      // User is signed in, check if their profile exists in Firestore
-      const checkUserProfile = async () => {
+      // User is signed in, check and initialize profile in Firestore
+      const checkAndInitializeProfile = async () => {
+        if (!user) return;
+        
         try {
           const docRef = doc(db, "users", userId!);
           const docSnap = await getDoc(docRef);
           
           if (docSnap.exists()) {
-            // User profile exists, redirect to main app dashboard if they are on onboarding or auth screens
-            if (inAuthGroup || isOnboarding) {
-              router.replace("/(app)" as any);
+            const data = docSnap.data();
+            if (data.onboardingComplete) {
+              // User profile complete, redirect to main app dashboard
+              if (inAuthGroup || isOnboarding) {
+                router.replace("/(app)" as any);
+              }
+            } else {
+              // Document exists but onboarding not complete, go to onboarding
+              if (!isOnboarding) {
+                router.replace("/(app)/onboarding" as any);
+              }
             }
           } else {
-            // Profile doesn't exist, redirect to onboarding unless already there
+            // Initialize user document with basic Clerk information immediately
+            await setDoc(docRef, {
+              clerkId: user.id,
+              name: user.fullName || "User",
+              email: user.primaryEmailAddress?.emailAddress || "",
+              profileImage: user.imageUrl || "",
+              createdAt: new Date().toISOString(),
+              onboardingComplete: false,
+            });
+
+            // Redirect new user to onboarding
             if (!isOnboarding) {
               router.replace("/(app)/onboarding" as any);
             }
           }
         } catch (error) {
-          console.error("Error checking user profile in Firestore:", error);
-          // Fallback: in case of Firestore error/offline, allow entry to main dashboard
+          console.error("Error verifying or initializing user profile:", error);
+          // Fallback: in case of Firestore connection issue, allow entry to main dashboard
           if (inAuthGroup) {
             router.replace("/(app)" as any);
           }
@@ -53,9 +74,9 @@ function InitialLayout() {
         }
       };
 
-      checkUserProfile();
+      checkAndInitializeProfile();
     }
-  }, [isLoaded, isSignedIn, userId, segments]);
+  }, [isLoaded, isSignedIn, userId, user, segments]);
 
   if (!isLoaded || checkingProfile) {
     return (
