@@ -6,6 +6,7 @@ import {
   Image,
   TouchableOpacityProps,
 } from "react-native";
+import { useThemeColors } from "@/constants/theme";
 
 interface GoogleButtonProps extends TouchableOpacityProps {
   title?: string;
@@ -19,9 +20,16 @@ export const GoogleButton: React.FC<GoogleButtonProps> = ({
   style,
   ...props
 }) => {
+  const theme = useThemeColors();
+
   return (
     <TouchableOpacity
-      style={[styles.button, (disabled || loading) && styles.disabledButton, style]}
+      style={[
+        styles.button,
+        { backgroundColor: theme.card, borderColor: theme.border },
+        (disabled || loading) && styles.disabledButton,
+        style,
+      ]}
       disabled={disabled || loading}
       activeOpacity={0.8}
       {...props}
@@ -32,31 +40,30 @@ export const GoogleButton: React.FC<GoogleButtonProps> = ({
         }}
         style={styles.icon}
       />
-      <Text style={styles.buttonText}>{title}</Text>
+      <Text style={[styles.buttonText, { color: theme.foreground }]}>
+        {title}
+      </Text>
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: "#161616",
-    height: 52,
-    borderRadius: 12,
+    height: 48,
+    borderRadius: 10,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#222222",
     width: "100%",
   },
   icon: {
-    width: 20,
-    height: 20,
-    marginRight: 12,
+    width: 18,
+    height: 18,
+    marginRight: 10,
   },
   buttonText: {
-    color: "#FFFFFF",
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: "600",
   },
   disabledButton: {

@@ -8,6 +8,7 @@ import {
   TextInputProps,
 } from "react-native";
 import { SymbolView } from "expo-symbols";
+import { useThemeColors } from "@/constants/theme";
 
 interface CustomInputProps extends TextInputProps {
   label: string;
@@ -24,13 +25,27 @@ export const CustomInput: React.FC<CustomInputProps> = ({
   style,
   ...props
 }) => {
+  const theme = useThemeColors();
+
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>{label}</Text>
-      <View style={styles.inputWrapper}>
+      <Text style={[styles.label, { color: theme.mutedForeground }]}>
+        {label}
+      </Text>
+      <View
+        style={[
+          styles.inputWrapper,
+          { backgroundColor: theme.card, borderColor: theme.border },
+        ]}
+      >
         <TextInput
-          style={[styles.input, isPassword && { paddingRight: 50 }, style]}
-          placeholderTextColor="#666"
+          style={[
+            styles.input,
+            { color: theme.foreground },
+            isPassword && { paddingRight: 50 },
+            style,
+          ]}
+          placeholderTextColor={theme.mutedForeground}
           {...props}
         />
         {isPassword && onTogglePassword && (
@@ -42,7 +57,7 @@ export const CustomInput: React.FC<CustomInputProps> = ({
             <SymbolView
               name={showPassword ? "eye.slash" : "eye"}
               size={18}
-              tintColor="#A0A0A0"
+              tintColor={theme.mutedForeground}
             />
           </TouchableOpacity>
         )}
@@ -59,7 +74,6 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 12,
     fontWeight: "600",
-    color: "#A0A0A0",
     marginBottom: 8,
     textTransform: "uppercase",
     letterSpacing: 0.5,
@@ -67,18 +81,15 @@ const styles = StyleSheet.create({
   inputWrapper: {
     position: "relative",
     width: "100%",
-    backgroundColor: "#161616",
-    borderRadius: 12,
+    borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#222222",
     flexDirection: "row",
     alignItems: "center",
   },
   input: {
     flex: 1,
-    height: 52,
+    height: 48,
     paddingHorizontal: 16,
-    color: "#FFFFFF",
     fontSize: 15,
   },
   eyeIcon: {

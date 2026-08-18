@@ -13,8 +13,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { completeOnboardingProfile } from "@/services/userService";
 import { CustomInput } from "@/components/ui/CustomInput";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
+import { useThemeColors } from "@/constants/theme";
 
 export default function OnboardingScreen() {
+  const theme = useThemeColors();
   const { user } = useUser();
   const router = useRouter();
 
@@ -72,7 +74,7 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardView}
@@ -83,9 +85,11 @@ export default function OnboardingScreen() {
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.header}>
-            <Text style={styles.title}>Complete Your Profile</Text>
-            <Text style={styles.subtitle}>
-              Help CalMate AI personalize your daily calorie and nutrition targets
+            <Text style={[styles.title, { color: theme.foreground }]}>
+              Profile Onboarding
+            </Text>
+            <Text style={[styles.subtitle, { color: theme.mutedForeground }]}>
+              Set up your physical metrics and daily calorie goals to start tracking
             </Text>
           </View>
 
@@ -101,7 +105,7 @@ export default function OnboardingScreen() {
             />
 
             <CustomInput
-              label="Target Daily Calories (kcal)"
+              label="Daily Calorie Target (kcal)"
               placeholder="e.g. 2000"
               keyboardType="number-pad"
               value={targetCalories}
@@ -150,7 +154,11 @@ export default function OnboardingScreen() {
               }}
             />
 
-            {error && <Text style={styles.errorText}>{error}</Text>}
+            {error && (
+              <Text style={[styles.errorText, { color: theme.destructive }]}>
+                {error}
+              </Text>
+            )}
 
             <PrimaryButton
               title="Complete Setup"
@@ -167,7 +175,6 @@ export default function OnboardingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0A0A0A",
   },
   keyboardView: {
     flex: 1,
@@ -184,17 +191,16 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   title: {
-    fontSize: 26,
-    fontWeight: "800",
-    color: "#FFFFFF",
+    fontSize: 24,
+    fontWeight: "700",
     letterSpacing: -0.5,
   },
   subtitle: {
     fontSize: 14,
-    color: "#888888",
     textAlign: "center",
     marginTop: 8,
     maxWidth: "85%",
+    lineHeight: 20,
   },
   formContainer: {
     width: "100%",
@@ -207,7 +213,6 @@ const styles = StyleSheet.create({
     flex: 0.48,
   },
   errorText: {
-    color: "#EF4444",
     fontSize: 13,
     marginBottom: 16,
     fontWeight: "500",

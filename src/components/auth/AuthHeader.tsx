@@ -1,5 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, View, Image } from "react-native";
+import { useThemeColors } from "@/constants/theme";
 
 interface AuthHeaderProps {
   title: string;
@@ -7,6 +8,8 @@ interface AuthHeaderProps {
 }
 
 export const AuthHeader: React.FC<AuthHeaderProps> = ({ title, subtitle }) => {
+  const theme = useThemeColors();
+
   return (
     <View style={styles.header}>
       <Image
@@ -14,8 +17,10 @@ export const AuthHeader: React.FC<AuthHeaderProps> = ({ title, subtitle }) => {
         style={styles.logo}
         resizeMode="contain"
       />
-      <Text style={styles.title}>{title}</Text>
-      <Text style={styles.subtitle}>{subtitle}</Text>
+      <Text style={[styles.title, { color: theme.foreground }]}>{title}</Text>
+      <Text style={[styles.subtitle, { color: theme.mutedForeground }]}>
+        {subtitle}
+      </Text>
     </View>
   );
 };
@@ -23,25 +28,24 @@ export const AuthHeader: React.FC<AuthHeaderProps> = ({ title, subtitle }) => {
 const styles = StyleSheet.create({
   header: {
     alignItems: "center",
-    marginBottom: 36,
+    marginBottom: 32,
   },
   logo: {
-    width: 100,
-    height: 100,
+    width: 80,
+    height: 80,
     marginBottom: 16,
   },
   title: {
-    fontSize: 28,
-    fontWeight: "800",
-    color: "#FFFFFF",
+    fontSize: 24,
+    fontWeight: "700",
     letterSpacing: -0.5,
     textAlign: "center",
   },
   subtitle: {
     fontSize: 14,
-    color: "#888888",
     textAlign: "center",
     marginTop: 6,
     maxWidth: "85%",
+    lineHeight: 20,
   },
 });

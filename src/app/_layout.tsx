@@ -4,12 +4,14 @@ import { ClerkProvider, ClerkLoaded, useAuth, useUser } from "@clerk/expo";
 import { tokenCache } from "@/lib/clerk";
 import { getUserProfile, initializeUserProfile } from "@/services/userService";
 import { ActivityIndicator, View, StyleSheet } from "react-native";
+import { useThemeColors } from "@/constants/theme";
 
 function InitialLayout() {
   const { isLoaded, isSignedIn, userId } = useAuth();
   const { user } = useUser();
   const segments = useSegments() as any;
   const router = useRouter();
+  const theme = useThemeColors();
   const [checkingProfile, setCheckingProfile] = useState(true);
 
   useEffect(() => {
@@ -70,8 +72,8 @@ function InitialLayout() {
 
   if (!isLoaded || checkingProfile) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#10B981" />
+      <View style={[styles.loadingContainer, { backgroundColor: theme.background }]}>
+        <ActivityIndicator size="large" color={theme.primary} />
       </View>
     );
   }
@@ -100,6 +102,5 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#0A0A0A",
   },
 });

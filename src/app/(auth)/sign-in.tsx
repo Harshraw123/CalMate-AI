@@ -16,10 +16,12 @@ import { AuthHeader } from "@/components/auth/AuthHeader";
 import { CustomInput } from "@/components/ui/CustomInput";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { GoogleButton } from "@/components/ui/GoogleButton";
+import { useThemeColors } from "@/constants/theme";
 
 WebBrowser.maybeCompleteAuthSession();
 
 export default function SignInScreen() {
+  const theme = useThemeColors();
   const {
     email,
     setEmail,
@@ -35,7 +37,7 @@ export default function SignInScreen() {
   } = useSignInForm();
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardView}
@@ -80,7 +82,11 @@ export default function SignInScreen() {
               autoComplete="password"
             />
 
-            {error && <Text style={styles.errorText}>{error}</Text>}
+            {error && (
+              <Text style={[styles.errorText, { color: theme.destructive }]}>
+                {error}
+              </Text>
+            )}
 
             <PrimaryButton
               title="Sign In"
@@ -89,22 +95,34 @@ export default function SignInScreen() {
             />
 
             <View style={styles.dividerContainer}>
-              <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>or continue with</Text>
-              <View style={styles.dividerLine} />
+              <View
+                style={[styles.dividerLine, { backgroundColor: theme.border }]}
+              />
+              <Text
+                style={[
+                  styles.dividerText,
+                  { color: theme.mutedForeground },
+                ]}
+              >
+                or continue with
+              </Text>
+              <View
+                style={[styles.dividerLine, { backgroundColor: theme.border }]}
+              />
             </View>
 
-            <GoogleButton
-              onPress={handleGoogleSignIn}
-              loading={loading}
-            />
+            <GoogleButton onPress={handleGoogleSignIn} loading={loading} />
           </View>
 
           <View style={styles.footer}>
-            <Text style={styles.footerText}>Don't have an account? </Text>
+            <Text style={[styles.footerText, { color: theme.mutedForeground }]}>
+              Don't have an account?{" "}
+            </Text>
             <Link href={"/(auth)/sign-up" as any} asChild>
               <TouchableOpacity>
-                <Text style={styles.footerLink}>Sign Up</Text>
+                <Text style={[styles.footerLink, { color: theme.primary }]}>
+                  Sign Up
+                </Text>
               </TouchableOpacity>
             </Link>
           </View>
@@ -117,7 +135,6 @@ export default function SignInScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0A0A0A",
   },
   keyboardView: {
     flex: 1,
@@ -132,7 +149,6 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   errorText: {
-    color: "#EF4444",
     fontSize: 13,
     marginBottom: 16,
     fontWeight: "500",
@@ -145,10 +161,8 @@ const styles = StyleSheet.create({
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: "#222222",
   },
   dividerText: {
-    color: "#666666",
     fontSize: 13,
     paddingHorizontal: 16,
   },
@@ -159,11 +173,9 @@ const styles = StyleSheet.create({
     marginTop: 32,
   },
   footerText: {
-    color: "#666666",
     fontSize: 14,
   },
   footerLink: {
-    color: "#10B981",
     fontSize: 14,
     fontWeight: "600",
   },

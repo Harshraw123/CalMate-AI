@@ -14,8 +14,10 @@ import { useSignUpForm } from "@/hooks/useSignUpForm";
 import { AuthHeader } from "@/components/auth/AuthHeader";
 import { CustomInput } from "@/components/ui/CustomInput";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
+import { useThemeColors } from "@/constants/theme";
 
 export default function SignUpScreen() {
+  const theme = useThemeColors();
   const {
     email,
     setEmail,
@@ -37,7 +39,7 @@ export default function SignUpScreen() {
   } = useSignUpForm();
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardView}
@@ -51,8 +53,8 @@ export default function SignUpScreen() {
             title={pendingVerification ? "Verify Email" : "Create Account"}
             subtitle={
               pendingVerification
-                ? `Enter the code sent to ${email}`
-                : "Join CalMate AI to kickstart your fitness journey"
+                ? `Enter the 6-digit verification code sent to ${email}`
+                : "Join CalMate AI to track your nutrition intelligently"
             }
           />
 
@@ -103,7 +105,11 @@ export default function SignUpScreen() {
                   autoCapitalize="none"
                 />
 
-                {error && <Text style={styles.errorText}>{error}</Text>}
+                {error && (
+                  <Text style={[styles.errorText, { color: theme.destructive }]}>
+                    {error}
+                  </Text>
+                )}
 
                 <PrimaryButton
                   title="Sign Up"
@@ -124,7 +130,11 @@ export default function SignUpScreen() {
                   }}
                 />
 
-                {error && <Text style={styles.errorText}>{error}</Text>}
+                {error && (
+                  <Text style={[styles.errorText, { color: theme.destructive }]}>
+                    {error}
+                  </Text>
+                )}
 
                 <PrimaryButton
                   title="Verify Account"
@@ -136,7 +146,14 @@ export default function SignUpScreen() {
                   onPress={() => setPendingVerification(false)}
                   style={styles.backButton}
                 >
-                  <Text style={styles.backButtonText}>Back to Sign Up</Text>
+                  <Text
+                    style={[
+                      styles.backButtonText,
+                      { color: theme.mutedForeground },
+                    ]}
+                  >
+                    Back to Sign Up
+                  </Text>
                 </TouchableOpacity>
               </>
             )}
@@ -144,10 +161,14 @@ export default function SignUpScreen() {
 
           {!pendingVerification && (
             <View style={styles.footer}>
-              <Text style={styles.footerText}>Already have an account? </Text>
+              <Text style={[styles.footerText, { color: theme.mutedForeground }]}>
+                Already have an account?{" "}
+              </Text>
               <Link href={"/(auth)/sign-in" as any} asChild>
                 <TouchableOpacity>
-                  <Text style={styles.footerLink}>Sign In</Text>
+                  <Text style={[styles.footerLink, { color: theme.primary }]}>
+                    Sign In
+                  </Text>
                 </TouchableOpacity>
               </Link>
             </View>
@@ -161,7 +182,6 @@ export default function SignUpScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0A0A0A",
   },
   keyboardView: {
     flex: 1,
@@ -176,7 +196,6 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   errorText: {
-    color: "#EF4444",
     fontSize: 13,
     marginBottom: 16,
     fontWeight: "500",
@@ -186,7 +205,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   backButtonText: {
-    color: "#888888",
     fontSize: 14,
     fontWeight: "600",
   },
@@ -197,11 +215,9 @@ const styles = StyleSheet.create({
     marginTop: 32,
   },
   footerText: {
-    color: "#666666",
     fontSize: 14,
   },
   footerLink: {
-    color: "#10B981",
     fontSize: 14,
     fontWeight: "600",
   },

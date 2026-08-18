@@ -11,23 +11,28 @@ import {
 import { useClerk } from "@clerk/expo";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { useThemeColors } from "@/constants/theme";
 
 export default function DashboardScreen() {
+  const theme = useThemeColors();
   const { signOut } = useClerk();
   const { user, profile, loading, error } = useUserProfile();
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#10B981" />
+      <View style={[styles.loadingContainer, { backgroundColor: theme.background }]}>
+        <ActivityIndicator size="large" color={theme.primary} />
       </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Top bar header */}
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Header bar */}
         <View style={styles.topBar}>
           <View style={styles.userInfoContainer}>
             <Image
@@ -35,75 +40,148 @@ export default function DashboardScreen() {
                 uri:
                   profile?.profileImage ||
                   user?.imageUrl ||
-                  "https://ui-avatars.com/api/?name=User&background=10B981&color=fff",
+                  "https://ui-avatars.com/api/?name=User&background=15803D&color=fff",
               }}
-              style={styles.avatar}
+              style={[styles.avatar, { borderColor: theme.border }]}
             />
             <View>
-              <Text style={styles.greetingText}>Welcome back,</Text>
-              <Text style={styles.nameText}>
-                {profile?.name || user?.fullName || "Fitness Enthusiast"}
+              <Text style={[styles.greetingText, { color: theme.mutedForeground }]}>
+                Welcome back,
+              </Text>
+              <Text style={[styles.nameText, { color: theme.foreground }]}>
+                {profile?.name || user?.fullName || "Member"}
               </Text>
             </View>
           </View>
           <TouchableOpacity
-            style={styles.signOutButton}
+            style={[
+              styles.signOutButton,
+              { backgroundColor: theme.card, borderColor: theme.border },
+            ]}
             onPress={() => signOut()}
             activeOpacity={0.8}
           >
-            <Text style={styles.signOutText}>Sign Out</Text>
+            <Text style={[styles.signOutText, { color: theme.destructive }]}>
+              Sign Out
+            </Text>
           </TouchableOpacity>
         </View>
 
         {error && (
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>{error}</Text>
+          <View
+            style={[
+              styles.errorContainer,
+              { backgroundColor: theme.destructiveSubtle },
+            ]}
+          >
+            <Text style={[styles.errorText, { color: theme.destructive }]}>
+              {error}
+            </Text>
           </View>
         )}
 
-        {/* Dashboard statistics card */}
+        {/* Daily Overview */}
         <View style={styles.metricsContainer}>
-          <Text style={styles.sectionTitle}>Daily Overview</Text>
+          <Text style={[styles.sectionTitle, { color: theme.foreground }]}>
+            Daily Overview
+          </Text>
 
-          <View style={styles.calorieCard}>
-            <Text style={styles.calorieLabel}>Target Calories</Text>
-            <Text style={styles.calorieValue}>
+          {/* Calorie Card - Calories Orange restricted strictly to calorie value */}
+          <View
+            style={[
+              styles.calorieCard,
+              { backgroundColor: theme.card, borderColor: theme.border },
+            ]}
+          >
+            <Text
+              style={[styles.calorieLabel, { color: theme.mutedForeground }]}
+            >
+              Target Daily Calories
+            </Text>
+            <Text style={[styles.calorieValue, { color: theme.calories }]}>
               {profile?.targetCalories || 2000}{" "}
-              <Text style={styles.unitText}>kcal</Text>
+              <Text style={[styles.unitText, { color: theme.mutedForeground }]}>
+                kcal
+              </Text>
             </Text>
           </View>
 
+          {/* Physical Metrics Grid - Clean neutral cards */}
           <View style={styles.gridContainer}>
-            <View style={styles.metricCard}>
-              <Text style={styles.metricLabel}>Age</Text>
-              <Text style={styles.metricValue}>
+            <View
+              style={[
+                styles.metricCard,
+                { backgroundColor: theme.card, borderColor: theme.border },
+              ]}
+            >
+              <Text style={[styles.metricLabel, { color: theme.mutedForeground }]}>
+                Age
+              </Text>
+              <Text style={[styles.metricValue, { color: theme.foreground }]}>
                 {profile?.age || "--"}{" "}
-                <Text style={styles.metricUnit}>yrs</Text>
+                <Text style={[styles.metricUnit, { color: theme.mutedForeground }]}>
+                  yrs
+                </Text>
               </Text>
             </View>
 
-            <View style={styles.metricCard}>
-              <Text style={styles.metricLabel}>Weight</Text>
-              <Text style={styles.metricValue}>
+            <View
+              style={[
+                styles.metricCard,
+                { backgroundColor: theme.card, borderColor: theme.border },
+              ]}
+            >
+              <Text style={[styles.metricLabel, { color: theme.mutedForeground }]}>
+                Weight
+              </Text>
+              <Text style={[styles.metricValue, { color: theme.foreground }]}>
                 {profile?.weight || "--"}{" "}
-                <Text style={styles.metricUnit}>kg</Text>
+                <Text style={[styles.metricUnit, { color: theme.mutedForeground }]}>
+                  kg
+                </Text>
               </Text>
             </View>
 
-            <View style={styles.metricCard}>
-              <Text style={styles.metricLabel}>Height</Text>
-              <Text style={styles.metricValue}>
+            <View
+              style={[
+                styles.metricCard,
+                { backgroundColor: theme.card, borderColor: theme.border },
+              ]}
+            >
+              <Text style={[styles.metricLabel, { color: theme.mutedForeground }]}>
+                Height
+              </Text>
+              <Text style={[styles.metricValue, { color: theme.foreground }]}>
                 {profile?.height || "--"}{" "}
-                <Text style={styles.metricUnit}>cm</Text>
+                <Text style={[styles.metricUnit, { color: theme.mutedForeground }]}>
+                  cm
+                </Text>
               </Text>
             </View>
           </View>
         </View>
 
-        <View style={styles.placeholderCard}>
-          <Text style={styles.placeholderTitle}>AI Calorie Tracker</Text>
-          <Text style={styles.placeholderDescription}>
-            Ready to log your meals and track calories with AI vision intelligence.
+        {/* Integrated AI Meal Vision Card - AI Purple restricted to small badge */}
+        <View
+          style={[
+            styles.aiCard,
+            { backgroundColor: theme.card, borderColor: theme.border },
+          ]}
+        >
+          <View style={styles.aiBadgeHeader}>
+            <View
+              style={[styles.aiBadge, { backgroundColor: theme.aiSubtle }]}
+            >
+              <Text style={[styles.aiBadgeText, { color: theme.ai }]}>
+                AI Vision
+              </Text>
+            </View>
+          </View>
+          <Text style={[styles.aiCardTitle, { color: theme.foreground }]}>
+            Log Meal via Camera
+          </Text>
+          <Text style={[styles.aiCardDescription, { color: theme.mutedForeground }]}>
+            Snap a photo of your meal to instantly estimate macronutrients and calorie count.
           </Text>
         </View>
       </ScrollView>
@@ -114,13 +192,11 @@ export default function DashboardScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0A0A0A",
   },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#0A0A0A",
   },
   scrollContent: {
     paddingHorizontal: 20,
@@ -137,78 +213,66 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     marginRight: 12,
     borderWidth: 1,
-    borderColor: "#10B981",
   },
   greetingText: {
-    color: "#888888",
     fontSize: 13,
   },
   nameText: {
-    color: "#FFFFFF",
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: "700",
   },
   signOutButton: {
-    backgroundColor: "#161616",
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#222222",
   },
   signOutText: {
-    color: "#EF4444",
     fontSize: 13,
     fontWeight: "600",
   },
   errorContainer: {
-    backgroundColor: "#1F1212",
     padding: 12,
-    borderRadius: 10,
+    borderRadius: 8,
     marginBottom: 16,
   },
   errorText: {
-    color: "#EF4444",
     fontSize: 13,
   },
   metricsContainer: {
     marginBottom: 24,
   },
   sectionTitle: {
-    color: "#FFFFFF",
     fontSize: 18,
     fontWeight: "700",
-    marginBottom: 16,
+    marginBottom: 14,
+    letterSpacing: -0.3,
   },
   calorieCard: {
-    backgroundColor: "#161616",
-    borderRadius: 16,
+    borderRadius: 12,
     padding: 20,
     borderWidth: 1,
-    borderColor: "#222222",
-    marginBottom: 16,
+    marginBottom: 14,
   },
   calorieLabel: {
-    color: "#888888",
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: "600",
     textTransform: "uppercase",
     letterSpacing: 0.5,
   },
   calorieValue: {
-    color: "#10B981",
-    fontSize: 36,
+    fontSize: 34,
     fontWeight: "800",
     marginTop: 4,
+    letterSpacing: -0.5,
   },
   unitText: {
     fontSize: 16,
-    color: "#A0A0A0",
     fontWeight: "500",
   },
   gridContainer: {
@@ -217,47 +281,51 @@ const styles = StyleSheet.create({
   },
   metricCard: {
     flex: 0.31,
-    backgroundColor: "#161616",
     borderRadius: 12,
     padding: 14,
     borderWidth: 1,
-    borderColor: "#222222",
   },
   metricLabel: {
-    color: "#888888",
     fontSize: 12,
     fontWeight: "600",
   },
   metricValue: {
-    color: "#FFFFFF",
     fontSize: 18,
     fontWeight: "700",
     marginTop: 4,
   },
   metricUnit: {
     fontSize: 12,
-    color: "#888888",
     fontWeight: "400",
   },
-  placeholderCard: {
-    backgroundColor: "#121212",
-    borderRadius: 16,
+  aiCard: {
+    borderRadius: 12,
     padding: 20,
     borderWidth: 1,
-    borderColor: "#222222",
-    borderStyle: "dashed",
-    alignItems: "center",
-    marginTop: 8,
+    marginTop: 4,
   },
-  placeholderTitle: {
-    color: "#FFFFFF",
+  aiBadgeHeader: {
+    flexDirection: "row",
+    marginBottom: 10,
+  },
+  aiBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  aiBadgeText: {
+    fontSize: 11,
+    fontWeight: "700",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  aiCardTitle: {
     fontSize: 16,
     fontWeight: "700",
-    marginBottom: 6,
+    marginBottom: 4,
   },
-  placeholderDescription: {
-    color: "#888888",
+  aiCardDescription: {
     fontSize: 13,
-    textAlign: "center",
+    lineHeight: 18,
   },
 });
