@@ -24,7 +24,7 @@ export default function SignInScreen() {
   const theme = useThemeColors();
   const {
     authMethod,
-    setAuthMethod,
+    changeAuthMethod,
     email,
     setEmail,
     phoneNumber,
@@ -69,10 +69,7 @@ export default function SignInScreen() {
                   styles.tabButton,
                   authMethod === "email" && { backgroundColor: theme.muted },
                 ]}
-                onPress={() => {
-                  setAuthMethod("email");
-                  setError(null);
-                }}
+                onPress={() => changeAuthMethod("email")}
               >
                 <Text
                   style={[
@@ -94,10 +91,7 @@ export default function SignInScreen() {
                   styles.tabButton,
                   authMethod === "phone" && { backgroundColor: theme.muted },
                 ]}
-                onPress={() => {
-                  setAuthMethod("phone");
-                  setError(null);
-                }}
+                onPress={() => changeAuthMethod("phone")}
               >
                 <Text
                   style={[
@@ -117,6 +111,7 @@ export default function SignInScreen() {
 
             {authMethod === "email" ? (
               <CustomInput
+                key="signin-email-input"
                 label="Email Address"
                 placeholder="Enter your email"
                 value={email}
@@ -130,6 +125,7 @@ export default function SignInScreen() {
               />
             ) : (
               <CustomInput
+                key="signin-phone-input"
                 label="Phone Number"
                 placeholder="e.g. +1234567890"
                 value={phoneNumber}
@@ -144,6 +140,7 @@ export default function SignInScreen() {
             )}
 
             <CustomInput
+              key="signin-password-input"
               label="Password"
               placeholder="Enter your password"
               isPassword

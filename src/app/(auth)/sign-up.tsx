@@ -20,7 +20,7 @@ export default function SignUpScreen() {
   const theme = useThemeColors();
   const {
     authMethod,
-    setAuthMethod,
+    changeAuthMethod,
     email,
     setEmail,
     phoneNumber,
@@ -79,10 +79,7 @@ export default function SignUpScreen() {
                       styles.tabButton,
                       authMethod === "email" && { backgroundColor: theme.muted },
                     ]}
-                    onPress={() => {
-                      setAuthMethod("email");
-                      setError(null);
-                    }}
+                    onPress={() => changeAuthMethod("email")}
                   >
                     <Text
                       style={[
@@ -104,10 +101,7 @@ export default function SignUpScreen() {
                       styles.tabButton,
                       authMethod === "phone" && { backgroundColor: theme.muted },
                     ]}
-                    onPress={() => {
-                      setAuthMethod("phone");
-                      setError(null);
-                    }}
+                    onPress={() => changeAuthMethod("phone")}
                   >
                     <Text
                       style={[
@@ -127,6 +121,7 @@ export default function SignUpScreen() {
 
                 {authMethod === "email" ? (
                   <CustomInput
+                    key="signup-email-input"
                     label="Email Address"
                     placeholder="Enter your email"
                     value={email}
@@ -140,6 +135,7 @@ export default function SignUpScreen() {
                   />
                 ) : (
                   <CustomInput
+                    key="signup-phone-input"
                     label="Phone Number"
                     placeholder="e.g. +1234567890"
                     value={phoneNumber}
@@ -154,6 +150,7 @@ export default function SignUpScreen() {
                 )}
 
                 <CustomInput
+                  key="signup-password-input"
                   label="Password"
                   placeholder="Create a password"
                   isPassword
@@ -170,6 +167,7 @@ export default function SignUpScreen() {
                 />
 
                 <CustomInput
+                  key="signup-confirm-password-input"
                   label="Confirm Password"
                   placeholder="Confirm your password"
                   isPassword
@@ -199,6 +197,7 @@ export default function SignUpScreen() {
             ) : (
               <>
                 <CustomInput
+                  key="signup-code-input"
                   label="Verification Code"
                   placeholder="Enter 6-digit code"
                   keyboardType="number-pad"

@@ -19,6 +19,17 @@ export function useSignUpForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const changeAuthMethod = (method: AuthMethod) => {
+    setAuthMethod(method);
+    setEmail("");
+    setPhoneNumber("");
+    setPassword("");
+    setConfirmPassword("");
+    setCode("");
+    setPendingVerification(false);
+    setError(null);
+  };
+
   const handleSignUp = async () => {
     if (!isLoaded || !signUp) return;
     
@@ -135,7 +146,7 @@ export function useSignUpForm() {
 
   return {
     authMethod,
-    setAuthMethod,
+    changeAuthMethod,
     email,
     setEmail,
     phoneNumber,

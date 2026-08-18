@@ -18,6 +18,14 @@ export function useSignInForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const changeAuthMethod = (method: AuthMethod) => {
+    setAuthMethod(method);
+    setEmail("");
+    setPhoneNumber("");
+    setPassword("");
+    setError(null);
+  };
+
   const handleSignIn = async () => {
     if (!isLoaded || !signIn) return;
     
@@ -85,7 +93,7 @@ export function useSignInForm() {
 
   return {
     authMethod,
-    setAuthMethod,
+    changeAuthMethod,
     email,
     setEmail,
     phoneNumber,
