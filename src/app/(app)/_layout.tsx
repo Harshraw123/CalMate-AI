@@ -15,7 +15,7 @@ export default function AppLayout() {
 
   // Double check auth status at this layout layer
   if (!isSignedIn) {
-    return <Redirect href={"/(auth)/sign-in" as any} />;
+    return <Redirect href={"/(auth)/sign-up" as any} />;
   }
 
   return (

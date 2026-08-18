@@ -20,9 +20,9 @@ function InitialLayout() {
 
     if (!isSignedIn) {
       setCheckingProfile(false);
-      // Redirect to sign-in if the user is not in the auth group
+      // Redirect to sign-up if the user is not in the auth group
       if (!inAuthGroup) {
-        router.replace("/(auth)/sign-in" as any);
+        router.replace("/(auth)/sign-up" as any);
       }
     } else {
       // User is signed in, check if their profile exists in Firestore
