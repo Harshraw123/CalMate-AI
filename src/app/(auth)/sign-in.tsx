@@ -23,8 +23,12 @@ WebBrowser.maybeCompleteAuthSession();
 export default function SignInScreen() {
   const theme = useThemeColors();
   const {
+    authMethod,
+    setAuthMethod,
     email,
     setEmail,
+    phoneNumber,
+    setPhoneNumber,
     password,
     setPassword,
     showPassword,
@@ -53,18 +57,91 @@ export default function SignInScreen() {
           />
 
           <View style={styles.formContainer}>
-            <CustomInput
-              label="Email Address"
-              placeholder="Enter your email"
-              value={email}
-              onChangeText={(text) => {
-                setEmail(text);
-                setError(null);
-              }}
-              autoCapitalize="none"
-              keyboardType="email-address"
-              autoComplete="email"
-            />
+            {/* Method Selector Tabs */}
+            <View
+              style={[
+                styles.tabContainer,
+                { backgroundColor: theme.card, borderColor: theme.border },
+              ]}
+            >
+              <TouchableOpacity
+                style={[
+                  styles.tabButton,
+                  authMethod === "email" && { backgroundColor: theme.muted },
+                ]}
+                onPress={() => {
+                  setAuthMethod("email");
+                  setError(null);
+                }}
+              >
+                <Text
+                  style={[
+                    styles.tabText,
+                    {
+                      color:
+                        authMethod === "email"
+                          ? theme.foreground
+                          : theme.mutedForeground,
+                    },
+                  ]}
+                >
+                  Email
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.tabButton,
+                  authMethod === "phone" && { backgroundColor: theme.muted },
+                ]}
+                onPress={() => {
+                  setAuthMethod("phone");
+                  setError(null);
+                }}
+              >
+                <Text
+                  style={[
+                    styles.tabText,
+                    {
+                      color:
+                        authMethod === "phone"
+                          ? theme.foreground
+                          : theme.mutedForeground,
+                    },
+                  ]}
+                >
+                  Phone Number
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {authMethod === "email" ? (
+              <CustomInput
+                label="Email Address"
+                placeholder="Enter your email"
+                value={email}
+                onChangeText={(text) => {
+                  setEmail(text);
+                  setError(null);
+                }}
+                autoCapitalize="none"
+                keyboardType="email-address"
+                autoComplete="email"
+              />
+            ) : (
+              <CustomInput
+                label="Phone Number"
+                placeholder="e.g. +1234567890"
+                value={phoneNumber}
+                onChangeText={(text) => {
+                  setPhoneNumber(text);
+                  setError(null);
+                }}
+                autoCapitalize="none"
+                keyboardType="phone-pad"
+                autoComplete="tel"
+              />
+            )}
 
             <CustomInput
               label="Password"
@@ -147,6 +224,23 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     width: "100%",
+  },
+  tabContainer: {
+    flexDirection: "row",
+    borderRadius: 10,
+    borderWidth: 1,
+    padding: 3,
+    marginBottom: 20,
+  },
+  tabButton: {
+    flex: 1,
+    paddingVertical: 8,
+    borderRadius: 7,
+    alignItems: "center",
+  },
+  tabText: {
+    fontSize: 13,
+    fontWeight: "600",
   },
   errorText: {
     fontSize: 13,

@@ -1,12 +1,16 @@
 import { useState } from "react";
 import { useSignUp, useClerk, useAuth } from "@clerk/expo";
 
+export type AuthMethod = "email" | "phone";
+
 export function useSignUpForm() {
   const { signUp } = useSignUp();
   const { isLoaded } = useAuth();
   const { setActive } = useClerk();
 
+  const [authMethod, setAuthMethod] = useState<AuthMethod>("email");
   const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -17,8 +21,17 @@ export function useSignUpForm() {
 
   const handleSignUp = async () => {
     if (!isLoaded || !signUp) return;
-    if (!email || !password || !confirmPassword) {
-      setError("Please fill in all fields.");
+    
+    if (authMethod === "email" && !email) {
+      setError("Please enter your email address.");
+      return;
+    }
+    if (authMethod === "phone" && !phoneNumber) {
+      setError("Please enter your phone number.");
+      return;
+    }
+    if (!password || !confirmPassword) {
+      setError("Please fill in all password fields.");
       return;
     }
     if (password !== confirmPassword) {
@@ -30,21 +43,40 @@ export function useSignUpForm() {
     setError(null);
 
     try {
-      const { error: signUpError } = await signUp.create({
-        emailAddress: email,
-        password,
-      });
+      if (authMethod === "email") {
+        const { error: signUpError } = await signUp.create({
+          emailAddress: email,
+          password,
+        });
 
-      if (signUpError) {
-        setError(signUpError.message || "Sign-up failed.");
-        return;
-      }
+        if (signUpError) {
+          setError(signUpError.message || "Sign-up failed.");
+          return;
+        }
 
-      const { error: verificationError } = await signUp.verifications.sendEmailCode();
+        const { error: verificationError } = await signUp.verifications.sendEmailCode();
 
-      if (verificationError) {
-        setError(verificationError.message || "Failed to send verification code.");
-        return;
+        if (verificationError) {
+          setError(verificationError.message || "Failed to send verification code.");
+          return;
+        }
+      } else {
+        const { error: signUpError } = await signUp.create({
+          phoneNumber,
+          password,
+        });
+
+        if (signUpError) {
+          setError(signUpError.message || "Sign-up failed.");
+          return;
+        }
+
+        const { error: verificationError } = await signUp.verifications.sendPhoneCode();
+
+        if (verificationError) {
+          setError(verificationError.message || "Failed to send SMS verification code.");
+          return;
+        }
       }
 
       setPendingVerification(true);
@@ -67,17 +99,27 @@ export function useSignUpForm() {
     setError(null);
 
     try {
-      // 1. Verify the OTP code
-      const { error: verifyError } = await signUp.verifications.verifyEmailCode({
-        code,
-      });
+      if (authMethod === "email") {
+        const { error: verifyError } = await signUp.verifications.verifyEmailCode({
+          code,
+        });
 
-      if (verifyError) {
-        setError(verifyError.message || "Invalid verification code.");
-        return;
+        if (verifyError) {
+          setError(verifyError.message || "Invalid verification code.");
+          return;
+        }
+      } else {
+        const { error: verifyError } = await signUp.verifications.verifyPhoneCode({
+          code,
+        });
+
+        if (verifyError) {
+          setError(verifyError.message || "Invalid SMS verification code.");
+          return;
+        }
       }
 
-      // 2. Finalize sign-up session directly once OTP code is verified
+      // Finalize sign-up session directly once code is verified
       const { error: finalizeError } = await signUp.finalize();
       if (finalizeError) {
         setError(finalizeError.message || "Failed to finalize session.");
@@ -92,8 +134,12 @@ export function useSignUpForm() {
   };
 
   return {
+    authMethod,
+    setAuthMethod,
     email,
     setEmail,
+    phoneNumber,
+    setPhoneNumber,
     password,
     setPassword,
     confirmPassword,

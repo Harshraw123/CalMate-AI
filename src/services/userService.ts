@@ -28,12 +28,14 @@ export async function initializeUserProfile(user: any): Promise<UserProfile> {
     user.fullName ||
     (user.firstName ? `${user.firstName} ${user.lastName || ""}`.trim() : "") ||
     user.primaryEmailAddress?.emailAddress?.split("@")[0] ||
+    user.primaryPhoneNumber?.phoneNumber ||
     "User";
 
   const newProfile: UserProfile = {
     clerkId: user.id,
     name: userDisplayName,
     email: user.primaryEmailAddress?.emailAddress || "",
+    phoneNumber: user.primaryPhoneNumber?.phoneNumber || "",
     profileImage: user.imageUrl || "",
     createdAt: new Date().toISOString(),
     onboardingComplete: false,

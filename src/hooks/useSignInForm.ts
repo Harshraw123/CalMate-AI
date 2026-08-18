@@ -2,13 +2,17 @@ import { useState, useCallback } from "react";
 import { useSignIn, useOAuth, useClerk, useAuth } from "@clerk/expo";
 import * as Linking from "expo-linking";
 
+export type AuthMethod = "email" | "phone";
+
 export function useSignInForm() {
   const { signIn } = useSignIn();
   const { startOAuthFlow } = useOAuth({ strategy: "oauth_google" });
   const { isLoaded } = useAuth();
   const { setActive } = useClerk();
 
+  const [authMethod, setAuthMethod] = useState<AuthMethod>("email");
   const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -16,8 +20,15 @@ export function useSignInForm() {
 
   const handleSignIn = async () => {
     if (!isLoaded || !signIn) return;
-    if (!email || !password) {
-      setError("Please fill in all fields.");
+    
+    const identifier = authMethod === "email" ? email : phoneNumber;
+
+    if (!identifier || !password) {
+      setError(
+        `Please fill in your ${
+          authMethod === "email" ? "email address" : "phone number"
+        } and password.`
+      );
       return;
     }
 
@@ -26,7 +37,7 @@ export function useSignInForm() {
 
     try {
       const { error: signInError } = await signIn.create({
-        identifier: email,
+        identifier,
         password,
       });
 
@@ -73,8 +84,12 @@ export function useSignInForm() {
   }, [isLoaded, startOAuthFlow, setActive]);
 
   return {
+    authMethod,
+    setAuthMethod,
     email,
     setEmail,
+    phoneNumber,
+    setPhoneNumber,
     password,
     setPassword,
     showPassword,

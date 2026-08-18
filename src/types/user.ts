@@ -2,6 +2,7 @@ export interface UserProfile {
   clerkId: string;
   name: string;
   email: string;
+  phoneNumber?: string;
   profileImage: string;
   createdAt: string;
   onboardingComplete: boolean;
