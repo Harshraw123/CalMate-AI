@@ -49,9 +49,15 @@ function InitialLayout() {
             }
           } else {
             // Initialize user document with basic Clerk information immediately
+            const userDisplayName =
+              user.fullName ||
+              (user.firstName ? `${user.firstName} ${user.lastName || ""}`.trim() : "") ||
+              user.primaryEmailAddress?.emailAddress?.split("@")[0] ||
+              "User";
+
             await setDoc(docRef, {
               clerkId: user.id,
-              name: user.fullName || "User",
+              name: userDisplayName,
               email: user.primaryEmailAddress?.emailAddress || "",
               profileImage: user.imageUrl || "",
               createdAt: new Date().toISOString(),
